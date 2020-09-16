@@ -1,6 +1,7 @@
 import smtplib as smtp
 import xlrd
 import time
+import datetime
 
 
 class readExcel():
@@ -14,6 +15,7 @@ class readExcel():
         reminder = xlrd.open_workbook(excel)
         self.emailSheet = reminder.sheet_by_index(0)
         self.reminderSheet = reminder.sheet_by_index(1)
+        self.dateModeReminder = reminder.datemode
 
         pass
 
@@ -21,25 +23,53 @@ class readExcel():
 
         #(x,y)
 
+        emailList = []
+
         for cell in range(self.emailSheet.nrows):
             #loop get each cell value within columns
 
-            value = self.emailSheet.cell_value(cell,0)
+            #get all values required
+            division = self.emailSheet.cell_value(cell,1)
+            email = self.emailSheet.cell_value(cell,0)
+
+            #append row
+            emailData = [division,email]
+
+            #create row array
+            emailList.append(emailData)
 
             #put mailer here
-            print(value)
 
             pass
+        print(emailList)
 
         pass
 
     def reminderFinder(self):
 
-        for cell in range(self.reminderSheet.nrows):
+        reminderList = []
 
-            value = self.reminderSheet.cell_value(cell,0)
-            print(value)
+        for cell in range(self.reminderSheet.nrows):
+            #loop get each cell value within columns
+
+            #get date value
+            dateValue = self.reminderSheet.cell_value(cell,0)
+            #get data as datetime
+            date = xlrd.xldate_as_tuple(dateValue, self.dateModeReminder)
+
+            #get all values required
+            date = datetime.datetime(date[0],date[1],date[2],10)
+            reminder = self.reminderSheet.cell_value(cell,1)
+            division = self.reminderSheet.cell_value(cell,2)
+
+            #append row
+            data = [date, reminder, division]
+
+            #create row array
+            reminderList.append(data)
+
             pass
+        print(reminderList)
 
         pass
 
