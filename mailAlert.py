@@ -41,7 +41,7 @@ class readExcel():
             emailList.append(emailData)
 
             pass
-        print(emailList)
+        #print(emailList)
 
         return(emailList)
 
@@ -69,7 +69,7 @@ class readExcel():
             reminderList.append(data)
 
             pass
-        print(reminderList)
+        #print(reminderList)
 
         return(reminderList)
 
@@ -81,14 +81,14 @@ class readExcel():
             #loop get each cell value within columns
 
             #get all values required
-            division = [self.divisionSheet.cell_value(cell,0)]
+            division = self.divisionSheet.cell_value(cell,0)
 
             #create row array
             divisionList.append(division)
 
             pass
 
-        print(divisionList)
+        #print(divisionList)
         return(divisionList)
 
 class reminderLoop(object):
@@ -106,6 +106,8 @@ class reminderLoop(object):
     def loopReminder(self, dayNotification, wichDivision):
         #loop through reminder list
 
+        listReminder = []
+
         for reminder in self.reminderList:
 
             #broadcast acording to teh division
@@ -117,7 +119,9 @@ class reminderLoop(object):
                     #after get due date now what
                     #broadcast acording to division
 
-                    print(reminder[2],reminder[1:3])
+                    #print(reminder[1],reminder[1:3])
+
+                    listReminder.append(reminder[1])
 
                     pass
 
@@ -125,9 +129,11 @@ class reminderLoop(object):
 
             pass
 
-        pass
+        return(listReminder)
 
-    def LoopDivision(self, wichDivision):
+    def loopDivision(self, wichDivision):
+
+        listEmail = []
 
         #get mail acording to division
         for mail in self.emailList:
@@ -135,13 +141,15 @@ class reminderLoop(object):
             #get email from list
             if mail[0] == wichDivision:
 
-                print(mail[1])
+                #print(mail[1])
+
+                listEmail.append(mail[1])
 
                 pass
 
             pass
 
-        pass
+        return(listEmail)
 
 class mailer(object):
     """docstring for mailer."""
@@ -182,21 +190,36 @@ class emailBlasterBuilder():
 
         pass
 
-    def divisionTarget(self, excel):
+    def divisionTarget(self, excel, dayPeriod):
 
+        #BUG BUG
         #get excel data
         getExcelData = readExcel(excel)
         #get email sheet
         getEmailData = getExcelData.emailFinder()
         #get reminder sheet
         getReminderData = getExcelData.reminderFinder()
+        #get division list
+        getDivisionData = getExcelData.listDivision()
 
         #find reminder and loop division
-        getDivision = reminderLoop(getEmailData, getReminderData)
+        getDivision = reminderLoop(getReminderData, getEmailData)
 
-        for division in variable:
+        #loop through list of division and mail according to it
+        for division in getDivisionData:
+
+            #get reminder acording to due date and division
+            #mail according to division
+            getReminder = getDivision.loopReminder(dayPeriod, division)
+            getEmail = getDivision.loopDivision(division)
+            print(getReminder)
+            print(getEmail)
+            print("==================")
+            #print(division)
+
+            #print(getReminder)
+            #print(getEmail)
             pass
-
         pass
 
 
@@ -212,10 +235,13 @@ class emailBlasterBuilder():
 #
 #mail = mailer().sendMail(smtpAddress, smtpPort, emailAdress, password, emailTarget)
 
-read = readExcel("data.xlsx")
-email = read.emailFinder()
-date = read.reminderFinder()
-division = read.listDivision()
-find = reminderLoop(date, email)
-reminder = find.loopReminder(3,"division 2")
-mail = find.LoopDivision("division 3")
+#read = readExcel("data.xlsx")
+#email = read.emailFinder()
+#date = read.reminderFinder()
+#division = read.listDivision()
+#find = reminderLoop(date, email)
+#reminder = find.loopReminder(3,"division 2")
+#mail = find.loopDivision("division 3")
+
+
+run = emailBlasterBuilder().divisionTarget("data.xlsx",3)
