@@ -15,11 +15,13 @@ class readExcel():
         reminder = xlrd.open_workbook(excel)
         self.emailSheet = reminder.sheet_by_index(0)
         self.reminderSheet = reminder.sheet_by_index(1)
+        self.divisionSheet = reminder.sheet_by_index(2)
+        #read excel files as datemode format
         self.dateModeReminder = reminder.datemode
 
         pass
 
-    def emailList(self):
+    def emailFinder(self):
 
         #(x,y)
 
@@ -38,12 +40,10 @@ class readExcel():
             #create row array
             emailList.append(emailData)
 
-            #put mailer here
-
             pass
         print(emailList)
 
-        pass
+        return(emailList)
 
     def reminderFinder(self):
 
@@ -58,7 +58,7 @@ class readExcel():
             date = xlrd.xldate_as_tuple(dateValue, self.dateModeReminder)
 
             #get all values required
-            date = datetime.datetime(date[0],date[1],date[2],10)
+            date = datetime.date(date[0],date[1],date[2])
             reminder = self.reminderSheet.cell_value(cell,1)
             division = self.reminderSheet.cell_value(cell,2)
 
@@ -71,22 +71,75 @@ class readExcel():
             pass
         print(reminderList)
 
-        pass
+        return(reminderList)
 
-class reminderFinder(object):
+    def listDivision(self):
+
+        divisionList = []
+
+        for cell in range(self.divisionSheet.nrows):
+            #loop get each cell value within columns
+
+            #get all values required
+            division = [self.divisionSheet.cell_value(cell,0)]
+
+            #create row array
+            divisionList.append(division)
+
+            pass
+
+        print(divisionList)
+        return(divisionList)
+
+class reminderLoop(object):
     """docstring for reminderFinder."""
 
-    def __init__(self):
+    def __init__(self, reminderList, emailList):
+
+        #create gloal variable
+        #read list
+        self.reminderList = reminderList
+        self.emailList = emailList
 
         pass
 
-    def loopReminder(self):
-        #loop trough excel data
+    def loopReminder(self, dayNotification, wichDivision):
+        #loop through reminder list
+
+        for reminder in self.reminderList:
+
+            #broadcast acording to teh division
+            if reminder[2] == wichDivision:
+
+                #broadcast if near due date
+                if datetime.date.today() + datetime.timedelta(days = dayNotification) >= reminder[0]:
+
+                    #after get due date now what
+                    #broadcast acording to division
+
+                    print(reminder[2],reminder[1:3])
+
+                    pass
+
+                pass
+
+            pass
 
         pass
 
-    def fname(self):
+    def LoopDivision(self, wichDivision):
 
+        #get mail acording to division
+        for mail in self.emailList:
+
+            #get email from list
+            if mail[0] == wichDivision:
+
+                print(mail[1])
+
+                pass
+
+            pass
 
         pass
 
@@ -122,6 +175,31 @@ class mailer(object):
 
         pass
 
+class emailBlasterBuilder():
+    """Build email Blaster Bot"""
+
+    def __init__(self):
+
+        pass
+
+    def divisionTarget(self, excel):
+
+        #get excel data
+        getExcelData = readExcel(excel)
+        #get email sheet
+        getEmailData = getExcelData.emailFinder()
+        #get reminder sheet
+        getReminderData = getExcelData.reminderFinder()
+
+        #find reminder and loop division
+        getDivision = reminderLoop(getEmailData, getReminderData)
+
+        for division in variable:
+            pass
+
+        pass
+
+
 #===================[run]===================#
 
 #emailAdress = input("email address: ")
@@ -135,5 +213,9 @@ class mailer(object):
 #mail = mailer().sendMail(smtpAddress, smtpPort, emailAdress, password, emailTarget)
 
 read = readExcel("data.xlsx")
-email = read.emailList()
+email = read.emailFinder()
 date = read.reminderFinder()
+division = read.listDivision()
+find = reminderLoop(date, email)
+reminder = find.loopReminder(3,"division 2")
+mail = find.LoopDivision("division 3")
