@@ -158,7 +158,7 @@ class mailer(object):
 
         pass
 
-    def sendMail(self, smtpAddress, smtpPort, emailAdress, password, emailTarget):
+    def sendMail(self, smtpAddress, smtpPort, emailAdress, password, emailTarget, subject, body):
 
 
         #send access SMTP
@@ -173,9 +173,10 @@ class mailer(object):
         #login email
         server.login(emailAdress, password)
 
-        subject = "this is thest subject"
-        body = "this is test body email"
+        #subject = "this is thest subject"
+        #body = "this is test body email"
 
+        #content message
         msg = f'Subject: {subject}\n\n{body}'
 
         server.sendmail(emailAdress, emailTarget, msg)
@@ -190,9 +191,8 @@ class emailBlasterBuilder():
 
         pass
 
-    def divisionTarget(self, excel, dayPeriod):
+    def divisionTarget(self, excel, dayPeriod, smtpAddress, smtpPort, emailAdress, password, subject):
 
-        #BUG BUG
         #get excel data
         getExcelData = readExcel(excel)
         #get email sheet
@@ -212,27 +212,46 @@ class emailBlasterBuilder():
             #mail according to division
             getReminder = getDivision.loopReminder(dayPeriod, division)
             getEmail = getDivision.loopDivision(division)
-            print(getReminder)
-            print(getEmail)
-            print("==================")
-            #print(division)
 
-            #print(getReminder)
-            #print(getEmail)
+            #don't broadcast if there's no reminder
+            if len(getReminder) > 0:
+
+                for emailTarget in getEmail:
+
+                    body = "berikut merupakan tagihan/perihal lainnya yang jatuh tempo"
+
+                    body = body + "\n" + "\n".join(getReminder)
+
+                    #broadcast email
+                    mailTo = mailer().sendMail(smtpAddress, smtpPort, emailAdress, password, emailTarget, subject, body)
+
+                    pass
+
+                print(getReminder)
+                print(getEmail)
+                print("==================")
+
+            else:
+
+                continue
+
+
+
+
             pass
         pass
 
 
 #===================[run]===================#
 
-#emailAdress = input("email address: ")
+emailAdress = input("email address: ")
 #emailTarget = input("email Target: ")
-#password = input("password: ")
+password = input("password: ")
 #
-#smtpAddress = "smtp.gmail.com"
-#smtpPort = 587
+smtpAddress = "smtp.gmail.com"
+smtpPort = 587
 #
-#
+subject = "testing"
 #mail = mailer().sendMail(smtpAddress, smtpPort, emailAdress, password, emailTarget)
 
 #read = readExcel("data.xlsx")
@@ -244,4 +263,4 @@ class emailBlasterBuilder():
 #mail = find.loopDivision("division 3")
 
 
-run = emailBlasterBuilder().divisionTarget("data.xlsx",3)
+run = emailBlasterBuilder().divisionTarget("data.xlsx",3, smtpAddress, smtpPort, emailAdress, password, subject)
