@@ -140,8 +140,9 @@ class reminderLoop(object):
                     #broadcast acording to division
 
                     #print(reminder[1],reminder[1:3])
+                    data = f'{reminder[1]} tanggal {reminder[0]}'
 
-                    listReminder.append(reminder[1])
+                    listReminder.append(data)
 
                     pass
 
