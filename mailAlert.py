@@ -16,6 +16,7 @@ class readExcel():
         self.emailSheet = reminder.sheet_by_index(0)
         self.reminderSheet = reminder.sheet_by_index(1)
         self.divisionSheet = reminder.sheet_by_index(2)
+        self.configSheet = reminder.sheet_by_index(3)
         #read excel files as datemode format
         self.dateModeReminder = reminder.datemode
 
@@ -90,6 +91,25 @@ class readExcel():
 
         #print(divisionList)
         return(divisionList)
+
+    def getConfig(self):
+
+        config = []
+
+        for cell in range(self.configSheet.ncols):
+            #loop get each cell value within columns
+
+            #get all values required
+            cfg = self.configSheet.cell_value(1,cell)
+
+            #create row array
+            config.append(cfg)
+
+            pass
+
+        #print(config)
+        #pass
+        return(config)
 
 class reminderLoop(object):
     """docstring for reminderFinder."""
@@ -191,7 +211,19 @@ class emailBlasterBuilder():
 
         pass
 
-    def divisionTarget(self, excel, dayPeriod, smtpAddress, smtpPort, emailAdress, password, subject):
+    def divisionTarget(self, excel):#, dayPeriod, smtpAddress, smtpPort, emailAdress, password, subject, header):
+
+        #get config fom excel
+        getConfig = readExcel("data.xlsx").getConfig()
+
+        #config data
+        smtpAddress = getConfig[0]
+        smtpPort = int(getConfig[1])
+        emailAdress = getConfig[2]
+        password = getConfig[3]
+        dayPeriod =  int(getConfig[4])
+        subject = getConfig[5]
+        header = getConfig[6]
 
         #get excel data
         getExcelData = readExcel(excel)
@@ -218,7 +250,7 @@ class emailBlasterBuilder():
 
                 for emailTarget in getEmail:
 
-                    body = "berikut merupakan tagihan/perihal lainnya yang jatuh tempo"
+                    body = header
 
                     body = body + "\n" + "\n".join(getReminder)
 
@@ -227,40 +259,19 @@ class emailBlasterBuilder():
 
                     pass
 
-                print(getReminder)
+                print("======================================")
                 print(getEmail)
-                print("==================")
+                print(getReminder)
 
             else:
 
                 continue
 
-
-
-
             pass
+
         pass
 
 
 #===================[run]===================#
 
-emailAdress = input("email address: ")
-#emailTarget = input("email Target: ")
-password = input("password: ")
-#
-smtpAddress = "smtp.gmail.com"
-smtpPort = 587
-#
-subject = "testing"
-#mail = mailer().sendMail(smtpAddress, smtpPort, emailAdress, password, emailTarget)
-
-#read = readExcel("data.xlsx")
-#email = read.emailFinder()
-#date = read.reminderFinder()
-#division = read.listDivision()
-#find = reminderLoop(date, email)
-#reminder = find.loopReminder(3,"division 2")
-#mail = find.loopDivision("division 3")
-
-
-run = emailBlasterBuilder().divisionTarget("data.xlsx",3, smtpAddress, smtpPort, emailAdress, password, subject)
+run = emailBlasterBuilder().divisionTarget("data.xlsx")
